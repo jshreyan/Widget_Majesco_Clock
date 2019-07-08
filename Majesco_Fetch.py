@@ -4,9 +4,13 @@ from requests_ntlm import HttpNtlmAuth
 import datetime
 from math import ceil
 import time
+from configparser import ConfigParser
 
-USERNAME = "shreya663976@majesco.com"
-PASSWORD = "Jul@2019"
+CONFIG = ConfigParser()
+CONFIG.read('config.ini')
+
+USERNAME = CONFIG.get('INFO', 'USERNAME')
+PASSWORD = CONFIG.get('INFO', 'PASSWORD')
 MAJESCO_URL = "https://www.majesconet.com/Pages/default.aspx"
 MAJESCO_URL_ATN = "https://ess.majesconet.com/Net04/HR/MyInfo/MyInfo_MyAttendance.aspx"
 
@@ -18,8 +22,11 @@ def majesco_login():
     resp = s.get(MAJESCO_URL)
     if resp.status_code==200:
         print('Logged In!!\n')
+        login = 1
     else:
         print('Error\n')
+        login = 0
+    return login
 
 def get_page():
     resp = s.get(MAJESCO_URL_ATN)
@@ -42,6 +49,9 @@ def get_data(pg_sp):
     intaggre = pg_sp.find('span',id=intaggreid).text
     print('DATE:',dt.strftime('%d-%m-%Y %I:%M%p'))
     print('IN_TIME:',intoday)
+
+    if intoday =='':
+        intoday = '00:00'
     return intoday,intaggre
 
 def week_of_month(dt):
